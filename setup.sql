@@ -1,0 +1,18 @@
+create table if not exists jk8_results (key text primary key, a int not null, b int not null, updated_at timestamptz not null default now());
+create table if not exists jk8_fees (team int primary key, paid_at timestamptz not null default now());
+create table if not exists jk8_settings (id int primary key default 1 check (id = 1), teams jsonb not null);
+insert into jk8_settings (id, teams) values (1, '["union","unionA","潔穴","ステラ","ハッピージャンプ","campus","サーカス団"]') on conflict (id) do nothing;
+alter table jk8_results enable row level security;
+alter table jk8_fees enable row level security;
+alter table jk8_settings enable row level security;
+create policy "jk8 results read" on jk8_results for select using (true);
+create policy "jk8 settings read" on jk8_settings for select using (true);
+create or replace function jk8_ok(p_id text, p_pw text) returns boolean language sql immutable as $$ select md5(p_id || '|' || p_pw) = 'a9f48276ca6499fa88a57d9fe918e8f9' $$;
+create or replace function jk8_login(p_id text, p_pw text) returns boolean language sql security definer set search_path = public as $$ select jk8_ok(p_id, p_pw) $$;
+create or replace function jk8_save_result(p_id text, p_pw text, p_key text, p_a int, p_b int) returns void language plpgsql security definer set search_path = public as $$ begin if not jk8_ok(p_id, p_pw) then raise exception 'not allowed'; end if; insert into jk8_results (key, a, b, updated_at) values (p_key, p_a, p_b, now()) on conflict (key) do update set a = excluded.a, b = excluded.b, updated_at = now(); end $$;
+create or replace function jk8_delete_result(p_id text, p_pw text, p_key text) returns void language plpgsql security definer set search_path = public as $$ begin if not jk8_ok(p_id, p_pw) then raise exception 'not allowed'; end if; delete from jk8_results where key = p_key; end $$;
+create or replace function jk8_set_fee(p_id text, p_pw text, p_team int, p_paid boolean) returns void language plpgsql security definer set search_path = public as $$ begin if not jk8_ok(p_id, p_pw) then raise exception 'not allowed'; end if; if p_paid then insert into jk8_fees (team, paid_at) values (p_team, now()) on conflict (team) do update set paid_at = now(); else delete from jk8_fees where team = p_team; end if; update jk8_settings set teams = teams where id = 1; end $$;
+create or replace function jk8_get_fees(p_id text, p_pw text) returns table (team int, paid_at timestamptz) language plpgsql security definer set search_path = public as $$ begin if not jk8_ok(p_id, p_pw) then raise exception 'not allowed'; end if; return query select f.team, f.paid_at from jk8_fees f; end $$;
+create or replace function jk8_save_teams(p_id text, p_pw text, p_teams jsonb) returns void language plpgsql security definer set search_path = public as $$ begin if not jk8_ok(p_id, p_pw) then raise exception 'not allowed'; end if; update jk8_settings set teams = p_teams where id = 1; end $$;
+grant execute on function jk8_login(text, text), jk8_save_result(text, text, text, int, int), jk8_delete_result(text, text, text), jk8_set_fee(text, text, int, boolean), jk8_get_fees(text, text), jk8_save_teams(text, text, jsonb) to anon, authenticated;
+alter publication supabase_realtime add table jk8_results, jk8_settings;
