@@ -219,7 +219,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){retur
 function sc(key){var v=state.scores[key];return (v&&typeof v[0]==='number'&&typeof v[1]==='number')?v:null}
 function name(i){return state.teams[i]||('チーム'+(i+1))}
 // 長いチーム名の改行位置（ここに足せば他のチームも調整できます）
-var SPLIT={'ハッピージャンプ':['ハッピー','ジャンプ'],'サーカス団':['サーカス','団']};
+var SPLIT={'ハッピージャンプ':['ハッピー','ジャンプ']};
 function nameHTML(i){var n=name(i);return SPLIT[n]?SPLIT[n].map(esc).join('<wbr>'):esc(n)}
 function nameLines(n){return SPLIT[n]||[n]}
 var CIRC=['①','②','③','④','⑤','⑥','⑦','⑧'];
