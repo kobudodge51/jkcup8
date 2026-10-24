@@ -42,10 +42,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 header.top::after{content:"";position:absolute;inset:auto 0 0;height:3px;background:var(--grad);background-size:200% 100%;animation:flow 6s linear infinite}
 .top .wrap{padding-block:14px 0;display:grid;gap:6px}
-.brand{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand h1{margin:0;font-weight:700;font-size:28px;letter-spacing:.06em;line-height:1.1;font-style:italic;
+.brand{display:flex;align-items:flex-end;padding-bottom:10px;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand h1{margin:0;padding-right:.2em;font-weight:700;font-size:28px;letter-spacing:.06em;line-height:1.1;font-style:italic;
   background:var(--grad);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 8s linear infinite}
-.brand h1 small{display:block;font-size:10.5px;font-style:normal;letter-spacing:.42em;color:var(--ink);-webkit-text-fill-color:var(--ink);margin-top:4px}
+.brand .sub{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink);margin-top:3px}
 .meta{font-size:11px;letter-spacing:.06em;color:var(--muted);display:flex;align-items:center;gap:6px}
 .live{width:8px;height:8px;border-radius:50%;background:var(--path-none)}
 .live.on{background:var(--ok);box-shadow:0 0 0 3px rgba(0,168,107,.18)}
@@ -69,12 +69,16 @@ h2::before{content:"";width:14px;height:4px;border-radius:2px;background:var(--g
 .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 4px 14px rgba(122,77,255,.3)}
 .slot{display:grid;gap:8px}
 .slot-h{display:flex;align-items:baseline;gap:10px}
-.time{font-weight:700;font-size:22px;font-style:italic;font-variant-numeric:tabular-nums;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.time{padding-right:.25em;font-weight:700;font-size:22px;font-style:italic;font-variant-numeric:tabular-nums;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .slot-h .lbl{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.08em}
 .pill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--grad);color:#fff}
 @media (prefers-reduced-motion:no-preference){.pill{animation:pulse 1.6s ease-in-out infinite}}
 .courts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media (max-width:520px){.courts{grid-template-columns:1fr}}
+.courts{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+.courthead{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 104px);z-index:4;padding-top:6px}
+.courthead span{text-align:center;font-size:12px;font-weight:700;letter-spacing:.1em;color:#fff;border-radius:8px;padding:4px 0}
+.courthead .a{background:var(--court-a)}.courthead .b{background:var(--court-b)}
+@media (max-width:520px){.match{padding:9px 9px;gap:4px;border-radius:12px}.tn{font-size:13px}.sc{font-size:20px;min-width:1.4em}.row.w .tn::after{display:none}.ref{font-size:10.5px}.court .stage{font-size:10px}.court i{width:18px;height:18px;font-size:11px}}
 .match,.card{background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,rgba(255,31,180,.35),rgba(122,77,255,.15) 40%,rgba(0,200,240,.35)) border-box;border:1px solid transparent;box-shadow:0 6px 20px rgba(40,30,120,.06)}
 .match{border-radius:14px;padding:11px 13px;display:grid;gap:6px;min-width:0;text-align:left;color:inherit;width:100%}
 .match.dim{opacity:.3}
@@ -103,10 +107,18 @@ td.name,th.name{text-align:left}td.name{font-weight:700}
 tr:last-child td{border-bottom:0}
 .rk{font-weight:700;font-style:italic;font-size:18px}.rk1{color:var(--pink)}
 .adv td{background:var(--court-a-soft)}
-.mx td,.mx th{border-right:1px solid var(--line);min-width:58px}
+.tbl-fit{width:100%;table-layout:fixed}
+.tbl-fit th,.tbl-fit td{padding:7px 2px;font-size:12px;white-space:normal}
+.tbl-fit td.name{font-size:12.5px;word-break:break-all;line-height:1.3}
+.tbl-fit .rk{font-size:15px}
+.tbl-fit .tie{display:block;margin:2px 0 0;font-size:9px}
+.mx td,.mx th{border-right:1px solid var(--line);padding:5px 1px}
+.mx thead th:not(.name){writing-mode:vertical-rl;text-orientation:mixed;height:92px;vertical-align:bottom;padding:6px 0;font-size:11px;letter-spacing:.02em;text-align:left;white-space:nowrap}
+.mx td.name{font-size:11px;padding:5px 4px;word-break:break-all;line-height:1.25}
+.mx .o,.mx .x{font-size:12px}
 .mx .diag{background:repeating-linear-gradient(135deg,transparent 0 6px,var(--line) 6px 7px)}
 .mx .o{color:var(--win);font-weight:700}.mx .x{color:#B4B8CC}
-.mx td small{display:block;font-size:11px;color:var(--muted)}
+.mx td small{display:block;font-size:9.5px;color:var(--muted);letter-spacing:-.02em}
 .tie{font-size:10px;font-weight:700;color:var(--violet);margin-left:6px}
 .bk{width:100%;height:auto;display:block;overflow:visible}
 .bk text{font-family:var(--font);fill:var(--ink)}
@@ -159,6 +171,17 @@ input:focus-visible{outline:2px solid var(--violet);outline-offset:1px}
 .sum{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-weight:700}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;font-weight:700;z-index:30;max-width:calc(100% - 32px);box-shadow:0 8px 24px rgba(122,77,255,.35)}
 .alert{border:1px solid var(--warn);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;background:#FFF2F5}
+body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:8;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);
+  padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));display:flex;justify-content:center}
+.bottomnav::before{content:"";position:absolute;inset:-1px 0 auto;height:2px;background:var(--grad)}
+.bottomnav .in{display:flex;width:100%;max-width:560px}
+.bottomnav button{flex:1 1 0;min-width:0;display:grid;justify-items:center;gap:2px;background:none;border:0;color:var(--muted);font-size:10.5px;font-weight:700;padding:4px 0;cursor:pointer;border-radius:10px}
+.bottomnav svg{width:24px;height:24px}
+.bottomnav button[aria-current="page"]{color:var(--pink)}
+.bottomnav button[aria-current="page"] svg{filter:drop-shadow(0 2px 6px rgba(255,31,180,.45))}
+.bottomnav button:focus-visible{outline:2px solid var(--violet)}
+.toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
 @keyframes flow{to{background-position:200% 0}}
 @keyframes pulse{50%{box-shadow:0 0 0 4px rgba(255,31,180,.2)}}
 @media (prefers-reduced-motion:reduce){header.top::after,.brand h1{animation:none}}
@@ -251,6 +274,7 @@ function viewSched(C){
   var h='<div style="display:grid;gap:8px"><h2>対戦表</h2><p class="note">予選は25分回し（21点・デュースなし）。チームを選ぶと、そのチームの試合と審判が分かります。</p>'+
     '<div class="chips" role="group" aria-label="チームで絞り込む"><button class="chip" data-filter="-1" aria-pressed="'+(filter<0)+'">全チーム</button>'+
     state.teams.map(function(t,i){return '<button class="chip" data-filter="'+i+'" aria-pressed="'+(filter===i)+'">'+esc(t)+'</button>'}).join('')+'</div></div>';
+  h+='<div class="courthead" aria-hidden="true"><span class="a">Aコート</span><span class="b">Bコート</span></div>';
   for(var s=0;s<=12;s++){
     if(s===11) h+='<div class="break"><span class="time">'+hm(T_AGG)+'</span>集計（10分）</div>';
     var row=ms.filter(function(m){return m.slot===s});
@@ -263,11 +287,11 @@ function viewSched(C){
 function viewLeague(C){
   var n=state.teams.length, started=C.played>0;
   var h='<div style="display:grid;gap:6px"><h2>予選リーグ 順位</h2><p class="note">'+C.played+' / '+C.total+' 試合終了。順位は 勝数 → 得失点差 → 直接対決 → 得点 の順で自動で決まります。上位4チームが決勝トーナメントへ。</p></div>';
-  h+='<div class="tbl-wrap"><table><thead><tr><th>順位</th><th class="name">チーム</th><th>試合</th><th>勝</th><th>敗</th><th>得点</th><th>失点</th><th>得失点差</th></tr></thead><tbody>';
+  h+='<div class="tbl-wrap"><table class="tbl-fit"><colgroup><col style="width:11%"><col style="width:31%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:11%"><col style="width:11%"><col style="width:12%"></colgroup><thead><tr><th>順位</th><th class="name">チーム</th><th>試合</th><th>勝</th><th>敗</th><th>得点</th><th>失点</th><th>得失<br>点差</th></tr></thead><tbody>';
   C.order.forEach(function(r){
     h+='<tr class="'+(started&&r.rank<=4?'adv':'')+'"><td class="rk'+(started&&r.rank===1?' rk1':'')+'">'+(started?r.rank:'–')+'</td><td class="name">'+esc(name(r.i))+(started&&r.tied?'<span class="tie">直接対決で決定</span>':'')+'</td><td>'+r.p+'</td><td>'+r.w+'</td><td>'+r.l+'</td><td>'+r.pf+'</td><td>'+r.pa+'</td><td>'+((r.pf-r.pa)>0?'+':'')+(r.pf-r.pa)+'</td></tr>';
   });
-  h+='</tbody></table></div><h2>リーグ表</h2><div class="tbl-wrap"><table class="mx"><thead><tr><th class="name">　</th>'+state.teams.map(function(t){return '<th>'+esc(t)+'</th>'}).join('')+'</tr></thead><tbody>';
+  h+='</tbody></table></div><h2>リーグ表</h2><div class="tbl-wrap"><table class="mx tbl-fit"><colgroup><col style="width:19%">'+state.teams.map(function(){return '<col>'}).join('')+'</colgroup><thead><tr><th class="name">　</th>'+state.teams.map(function(t){return '<th>'+esc(t)+'</th>'}).join('')+'</tr></thead><tbody>';
   for(var i=0;i<n;i++){
     h+='<tr><td class="name">'+esc(name(i))+'</td>';
     for(var j=0;j<n;j++){
@@ -400,8 +424,18 @@ function viewSettings(){
   return h+'<div class="actions"><button class="btn primary" id="save-settings" type="button">保存する</button></div></div>';
 }
 
-var PUB_TABS=[['sched','対戦表'],['league','順位・リーグ表'],['tour','トーナメント'],['info','要項']];
-var ADM_TABS=[['entry','結果入力'],['fees','参加費'],['tour','トーナメント'],['league','順位'],['sched','対戦表'],['settings','設定']];
+var PUB_TABS=[['sched','対戦表'],['league','順位'],['tour','トーナメント'],['info','要項']];
+var SV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+var ICONS={
+  sched:SV+'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M12 9v12"/></svg>',
+  league:SV+'<path d="M8 21V11H3v10h5zM15 21V4H9v17h6zM21 21v-7h-5v7h5z"/></svg>',
+  tour:SV+'<path d="M3 4h5v6h5M3 20h5v-6h5M13 7v10M13 12h8"/></svg>',
+  info:SV+'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>',
+  entry:SV+'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  fees:SV+'<circle cx="12" cy="12" r="9"/><path d="M8 7l4 5 4-5M12 12v6M9 13h6M9 16h6"/></svg>',
+  settings:SV+'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>'
+};
+var ADM_TABS=[['entry','入力'],['fees','参加費'],['sched','対戦表'],['league','順位'],['tour','トーナメント'],['settings','設定']];
 function render(){
   var C=compute(), admin=isAdmin();
   var tabs=admin?ADM_TABS:PUB_TABS;
@@ -415,11 +449,11 @@ function render(){
   // 入力中のフォーカスと値を守る
   var ae=document.activeElement, keep=ae&&ae.id&&ae.tagName==='INPUT'?{id:ae.id,v:ae.value,s:ae.selectionStart}:null;
   document.getElementById('app').innerHTML=
-    '<header class="top"><div class="wrap"><div class="brand"><h1>第8回JK杯<small>VOLLEYBALL FES 2026.10.31</small></h1><span class="meta">'+meta+'</span></div>'+
-    '<nav class="tabs" role="tablist">'+tabs.map(function(t){return '<button role="tab" data-tab="'+t[0]+'" aria-selected="'+(tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</nav></div></header>'+
+    '<header class="top"><div class="wrap"><div class="brand"><div><h1>第8回JK杯</h1><div class="sub">2026年10月31日（土）・山県市立 富岡小学校</div></div><span class="meta">'+meta+'</span></div></div></header>'+
     (admin?'<div class="adminbar"><div class="wrap"><span>管理者ページ</span><button type="button" id="logout">ログアウト</button></div></div>':'')+
     '<main><div class="wrap">'+view+'</div></main>'+
-    (admin||tab==='login'?'':'<footer><div class="wrap"><button type="button" class="linkbtn" data-tab="login">管理者ログイン</button></div></footer>');
+    (admin||tab==='login'?'':'<footer><div class="wrap"><button type="button" class="linkbtn" data-tab="login">管理者ログイン</button></div></footer>')+
+    '<nav class="bottomnav" aria-label="ページ切り替え"><div class="in">'+tabs.map(function(t){return '<button type="button" data-tab="'+t[0]+'"'+(tab===t[0]?' aria-current="page"':'')+'>'+(ICONS[t[0]]||'')+'<span>'+t[1]+'</span></button>'}).join('')+'</div></nav>';
   if(keep){var el=document.getElementById(keep.id);if(el){el.value=keep.v;el.focus();try{el.setSelectionRange(keep.s,keep.s)}catch(e){}}}
   if(tab==='settings') drawQR();
 }
