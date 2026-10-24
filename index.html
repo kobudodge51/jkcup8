@@ -88,14 +88,16 @@ h2::before{content:"";width:14px;height:4px;border-radius:2px;background:var(--g
 .court.a i{background:var(--court-a)}.court.b i{background:var(--court-b)}
 .court .stage{color:var(--muted)}
 .row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
-.tn{font-weight:700;font-size:15px;overflow-wrap:anywhere;min-width:0}
+.tn{font-weight:700;font-size:15px;word-break:keep-all;overflow-wrap:anywhere;line-height:1.25;min-width:0}
 .tn.ph{color:var(--muted);font-weight:400;font-size:13px}
 .sc{font-weight:700;font-style:italic;font-size:24px;line-height:1;font-variant-numeric:tabular-nums;min-width:1.6em;text-align:right;color:#B4B8CC}
 .row.w .tn{color:var(--ink)}.row.w .sc{color:var(--pink)}
 .row.w .tn::after{content:"WIN";font-size:9px;font-style:italic;letter-spacing:.1em;color:#fff;background:var(--grad);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:2px}
 .row.hl .tn{text-decoration:underline;text-decoration-color:var(--violet);text-decoration-thickness:2px;text-underline-offset:3px}
 .ref{font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:5px}
-.ref b{color:var(--ink)}.ref.hl b{color:var(--violet)}
+.ref .rl{white-space:nowrap;letter-spacing:-.02em}
+@media (max-width:520px){.ref .rl{font-size:9.5px}}
+.ref b{color:var(--ink);display:block;font-size:13px;word-break:keep-all;line-height:1.25;margin-top:1px}.nextline{line-height:1}.ref.hl b{color:var(--violet)}
 .break{display:flex;gap:10px;align-items:baseline;padding:9px 13px;border-radius:12px;background:var(--ink);color:#fff;font-size:13px;font-weight:700;letter-spacing:.06em}
 .break .time{background:none;color:var(--cyan);-webkit-text-fill-color:var(--cyan)}
 .card{border-radius:16px;padding:15px;display:grid;gap:12px;min-width:0}
@@ -109,13 +111,16 @@ tr:last-child td{border-bottom:0}
 .adv td{background:var(--court-a-soft)}
 .tbl-fit{width:100%;table-layout:fixed}
 .tbl-fit th,.tbl-fit td{padding:7px 2px;font-size:12px;white-space:normal}
-.tbl-fit td.name{font-size:12.5px;word-break:break-all;line-height:1.3}
+.tbl-fit td.name{font-size:12.5px;word-break:keep-all;overflow-wrap:anywhere;line-height:1.25}
 .tbl-fit .rk{font-size:15px}
 .tbl-fit .tie{display:block;margin:2px 0 0;font-size:9px}
 .mx td,.mx th{border-right:1px solid var(--line);padding:5px 1px}
-.mx thead th:not(.name){writing-mode:vertical-rl;text-orientation:mixed;height:92px;vertical-align:bottom;padding:6px 0;font-size:11px;letter-spacing:.02em;text-align:left;white-space:nowrap}
-.mx td.name{font-size:11px;padding:5px 4px;word-break:break-all;line-height:1.25}
-.mx .o,.mx .x{font-size:12px}
+.mx thead th{font-size:14px;padding:6px 0;color:var(--violet)}
+.mx thead th.name{font-size:11px;color:var(--muted);text-align:left;padding-left:6px}
+.mx td{height:46px;vertical-align:middle}
+.mx td.name{font-size:12px;padding:4px 4px 4px 6px;word-break:keep-all;overflow-wrap:anywhere;line-height:1.2;text-align:left}
+.mx td.name .no{color:var(--violet);margin-right:3px}
+.mx .o,.mx .x{font-size:13px;line-height:1.2}
 .mx .diag{background:repeating-linear-gradient(135deg,transparent 0 6px,var(--line) 6px 7px)}
 .mx .o{color:var(--win);font-weight:700}.mx .x{color:#B4B8CC}
 .mx td small{display:block;font-size:9.5px;color:var(--muted);letter-spacing:-.02em}
@@ -213,6 +218,11 @@ var cursor=+(ss('jk-cursor')||0);
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function sc(key){var v=state.scores[key];return (v&&typeof v[0]==='number'&&typeof v[1]==='number')?v:null}
 function name(i){return state.teams[i]||('チーム'+(i+1))}
+// 長いチーム名の改行位置（ここに足せば他のチームも調整できます）
+var SPLIT={'ハッピージャンプ':['ハッピー','ジャンプ'],'サーカス団':['サーカス','団']};
+function nameHTML(i){var n=name(i);return SPLIT[n]?SPLIT[n].map(esc).join('<wbr>'):esc(n)}
+function nameLines(n){return SPLIT[n]||[n]}
+var CIRC=['①','②','③','④','⑤','⑥','⑦','⑧'];
 function fmt(ts){if(!ts)return '';var d=new Date(ts);if(isNaN(d))return String(ts);return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
 function isAdmin(){return !!cred}
 try{cred=JSON.parse(localStorage.getItem('jk8-cred')||'null')}catch(e){cred=null}
@@ -263,10 +273,10 @@ function matches(C){
 function matchHTML(m,nextKey){
   if(!m) return '<div class="match empty">Bコート 試合なし</div>';
   var v=sc(m.key), inv=filter>=0&&!(m.a===filter||m.b===filter||m.ref===filter);
-  var rowF=function(t,ph,s,w){return '<div class="row'+(w?' w':'')+(filter>=0&&t===filter?' hl':'')+'"><span class="tn'+(t==null?' ph':'')+'">'+esc(t==null?ph:name(t))+'</span><span class="sc">'+(s==null?'–':s)+'</span></div>'};
-  return '<div class="match'+(inv?' dim':'')+'"><span class="court '+m.court.toLowerCase()+'"><i>'+m.court+'</i><span class="stage">'+esc(m.stage)+(m.key===nextKey?' ・ <span class="pill">次の試合</span>':'')+'</span></span>'+
+  var rowF=function(t,ph,s,w){return '<div class="row'+(w?' w':'')+(filter>=0&&t===filter?' hl':'')+'"><span class="tn'+(t==null?' ph':'')+'">'+(t==null?esc(ph):nameHTML(t))+'</span><span class="sc">'+(s==null?'–':s)+'</span></div>'};
+  return '<div class="match'+(inv?' dim':'')+'"><span class="court '+m.court.toLowerCase()+'"><i>'+m.court+'</i><span class="stage">'+esc(m.stage)+'</span></span>'+(m.key===nextKey?'<div class="nextline"><span class="pill">次の試合</span></div>':'')+
     rowF(m.a,m.pa,v?v[0]:null,v&&v[0]>v[1])+rowF(m.b,m.pb,v?v[1]:null,v&&v[1]>v[0])+
-    '<div class="ref'+(filter>=0&&m.ref===filter?' hl':'')+'">審判 <b>'+esc(m.ref==null?(m.pref||''):name(m.ref))+'</b>（主審・副審）</div></div>';
+    '<div class="ref'+(filter>=0&&m.ref===filter?' hl':'')+'"><span class="rl">審判（主審・副審・線審・得点）</span><b>'+(m.ref==null?esc(m.pref||''):nameHTML(m.ref))+'</b></div></div>';
 }
 function viewSched(C){
   var ms=matches(C), nextKey=null;
@@ -289,11 +299,11 @@ function viewLeague(C){
   var h='<div style="display:grid;gap:6px"><h2>予選リーグ 順位</h2><p class="note">'+C.played+' / '+C.total+' 試合終了。順位は 勝数 → 得失点差 → 直接対決 → 得点 の順で自動で決まります。上位4チームが決勝トーナメントへ。</p></div>';
   h+='<div class="tbl-wrap"><table class="tbl-fit"><colgroup><col style="width:11%"><col style="width:31%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:11%"><col style="width:11%"><col style="width:12%"></colgroup><thead><tr><th>順位</th><th class="name">チーム</th><th>試合</th><th>勝</th><th>敗</th><th>得点</th><th>失点</th><th>得失<br>点差</th></tr></thead><tbody>';
   C.order.forEach(function(r){
-    h+='<tr class="'+(started&&r.rank<=4?'adv':'')+'"><td class="rk'+(started&&r.rank===1?' rk1':'')+'">'+(started?r.rank:'–')+'</td><td class="name">'+esc(name(r.i))+(started&&r.tied?'<span class="tie">直接対決で決定</span>':'')+'</td><td>'+r.p+'</td><td>'+r.w+'</td><td>'+r.l+'</td><td>'+r.pf+'</td><td>'+r.pa+'</td><td>'+((r.pf-r.pa)>0?'+':'')+(r.pf-r.pa)+'</td></tr>';
+    h+='<tr class="'+(started&&r.rank<=4?'adv':'')+'"><td class="rk'+(started&&r.rank===1?' rk1':'')+'">'+(started?r.rank:'–')+'</td><td class="name">'+nameHTML(r.i)+(started&&r.tied?'<span class="tie">直接対決で決定</span>':'')+'</td><td>'+r.p+'</td><td>'+r.w+'</td><td>'+r.l+'</td><td>'+r.pf+'</td><td>'+r.pa+'</td><td>'+((r.pf-r.pa)>0?'+':'')+(r.pf-r.pa)+'</td></tr>';
   });
-  h+='</tbody></table></div><h2>リーグ表</h2><div class="tbl-wrap"><table class="mx tbl-fit"><colgroup><col style="width:19%">'+state.teams.map(function(){return '<col>'}).join('')+'</colgroup><thead><tr><th class="name">　</th>'+state.teams.map(function(t){return '<th>'+esc(t)+'</th>'}).join('')+'</tr></thead><tbody>';
+  h+='</tbody></table></div><h2>リーグ表</h2><div class="tbl-wrap"><table class="mx tbl-fit"><colgroup><col style="width:30%">'+state.teams.map(function(){return '<col>'}).join('')+'</colgroup><thead><tr><th class="name">チーム</th>'+state.teams.map(function(t,i){return '<th>'+CIRC[i]+'</th>'}).join('')+'</tr></thead><tbody>';
   for(var i=0;i<n;i++){
-    h+='<tr><td class="name">'+esc(name(i))+'</td>';
+    h+='<tr><td class="name"><span class="no">'+CIRC[i]+'</span>'+nameHTML(i)+'</td>';
     for(var j=0;j<n;j++){
       if(i===j){h+='<td class="diag"></td>';continue;}
       var v=C.h2h[i+'-'+j];
@@ -314,6 +324,16 @@ function svgText(x,y,t,size,cls,maxw){
   var fit=maxw&&len>maxw?' textLength="'+maxw+'" lengthAdjust="spacingAndGlyphs"':'';
   return '<text x="'+x+'" y="'+y+'" font-size="'+size+'" text-anchor="middle"'+(cls?' class="'+cls+'"':'')+fit+'>'+s+'</text>';
 }
+function svgName(x,y,t,size,maxw,cls){
+  var est=function(str,sz){var l=0;String(str).split('').forEach(function(ch){l+=ch.charCodeAt(0)>255?sz:sz*0.6});return l};
+  var lines=est(t,size)>maxw?nameLines(t):[t];
+  var w=Math.max.apply(null,lines.map(function(l){return est(l,size)}));
+  var sz=w>maxw?Math.max(9,Math.floor(size*maxw/w)):size;
+  var c=cls?' class="'+cls+'"':'';
+  if(lines.length===1) return '<text x="'+x+'" y="'+y+'" font-size="'+sz+'" text-anchor="middle"'+c+'>'+esc(lines[0])+'</text>';
+  var lh=sz+2, y0=y-lh/2+1;
+  return '<text x="'+x+'" y="'+y0+'" font-size="'+sz+'" text-anchor="middle"'+c+'>'+lines.map(function(l,k){return '<tspan x="'+x+'" dy="'+(k?lh:0)+'">'+esc(l)+'</tspan>'}).join('')+'</text>';
+}
 function scoreTag(x,y,val){ if(val==null) return ''; return '<rect class="scbg" x="'+(x-14)+'" y="'+(y-12)+'" width="28" height="18" rx="4"/>'+svgText(x,y+2,val,13,'sct'); }
 var GRAD_DEFS='<defs><linearGradient id="g-champ" x1="0" x2="1"><stop offset="0" stop-color="#FF1FB4"/><stop offset=".5" stop-color="#7A4DFF"/><stop offset="1" stop-color="#00C8F0"/></linearGradient><linearGradient id="g-third" x1="0" x2="1"><stop offset="0" stop-color="#FF9A1F"/><stop offset="1" stop-color="#FF1FB4"/></linearGradient></defs>';
 function bracketSVG(C){
@@ -327,7 +347,7 @@ function bracketSVG(C){
   h+=seg(jx1+','+yS+' '+jx1+','+yF+' '+cx+','+yF, T.sf1.w!=null?(pathColor(T.fin,'a')||'win'):null);
   h+=seg(jx2+','+yS+' '+jx2+','+yF+' '+cx+','+yF, T.sf2.w!=null?(pathColor(T.fin,'b')||'win'):null);
   h+=seg(cx+','+yF+' '+cx+',44', T.fin.w!=null?'win':null);
-  h+='<rect x="'+(cx-70)+'" y="8" width="140" height="36" rx="6" fill="url(#g-champ)"/>'+svgText(cx,22,'優勝',9,'champtx')+svgText(cx,38,T.fin.w!=null?name(T.fin.w):'—',14,'champtx',128);
+  h+='<rect x="'+(cx-70)+'" y="8" width="140" height="36" rx="6" fill="url(#g-champ)"/>'+svgText(cx,22,'優勝',9,'champtx')+svgName(cx,38,T.fin.w!=null?name(T.fin.w):'—',14,128,'champtx');
   h+=svgText(cx,yF-8,'決勝 Aコート '+hm(T_FIN),10,'sub');
   h+=svgText(jx1,yS+16,'準決勝①',10,'sub')+svgText(jx1,yS+29,'A '+hm(T_SF),10,'sub')+svgText(jx2,yS+16,'準決勝②',10,'sub')+svgText(jx2,yS+29,'B '+hm(T_SF),10,'sub');
   var v1=sc('sf1'),v2=sc('sf2'),vf=sc('fin');
@@ -335,7 +355,7 @@ function bracketSVG(C){
   if(T.sf2.a!=null&&v2){h+=scoreTag(X[2]+20,yS+52,v2[0])+scoreTag(X[3]-20,yS+52,v2[1]);}
   if(T.fin.a!=null&&vf){h+=scoreTag(jx1+20,yF+30,vf[0])+scoreTag(jx2-20,yF+30,vf[1]);}
   [[sd&&sd[0],'予選1位'],[sd&&sd[3],'予選4位'],[sd&&sd[1],'予選2位'],[sd&&sd[2],'予選3位']].forEach(function(s,i){
-    h+='<rect class="box" x="'+(X[i]-40)+'" y="'+yBox+'" width="80" height="58" rx="6"/>'+svgText(X[i],yBox+18,s[1],10,'sub')+svgText(X[i],yBox+40,s[0]!=null?name(s[0]):'未確定',s[0]!=null?13:11,s[0]!=null?'':'sub',72);
+    h+='<rect class="box" x="'+(X[i]-40)+'" y="'+yBox+'" width="80" height="58" rx="6"/>'+svgText(X[i],yBox+18,s[1],10,'sub')+svgName(X[i],yBox+40,s[0]!=null?name(s[0]):'未確定',s[0]!=null?13:11,70,s[0]!=null?'':'sub');
   });
   return h+'</svg>';
 }
@@ -345,11 +365,11 @@ function thirdSVG(C){
   h+=seg(xa+','+yB+' '+xa+','+yJ+' '+cx+','+yJ, pathColor(o,'a'));
   h+=seg(xb+','+yB+' '+xb+','+yJ+' '+cx+','+yJ, pathColor(o,'b'));
   h+=seg(cx+','+yJ+' '+cx+',44', o.w!=null?'win':null);
-  h+='<rect x="'+(cx-70)+'" y="8" width="140" height="36" rx="6" fill="url(#g-third)"/>'+svgText(cx,22,'3位',9,'champtx')+svgText(cx,38,o.w!=null?name(o.w):'—',14,'champtx',128);
+  h+='<rect x="'+(cx-70)+'" y="8" width="140" height="36" rx="6" fill="url(#g-third)"/>'+svgText(cx,22,'3位',9,'champtx')+svgName(cx,38,o.w!=null?name(o.w):'—',14,128,'champtx');
   h+=svgText(cx,yB+56,'3位決定戦 Bコート '+hm(T_FIN),10,'sub');
   if(o.a!=null&&v){h+=scoreTag(xa+22,yJ+18,v[0])+scoreTag(xb-22,yJ+18,v[1]);}
   [[xa,o.a,'準決勝①敗者'],[xb,o.b,'準決勝②敗者']].forEach(function(s){
-    h+='<rect class="box" x="'+(s[0]-62)+'" y="'+yB+'" width="124" height="40" rx="6"/>'+svgText(s[0],yB+25,s[1]!=null?name(s[1]):s[2],s[1]!=null?13:11,s[1]!=null?'':'sub',112);
+    h+='<rect class="box" x="'+(s[0]-62)+'" y="'+yB+'" width="124" height="40" rx="6"/>'+svgName(s[0],yB+25,s[1]!=null?name(s[1]):s[2],s[1]!=null?13:11,112,s[1]!=null?'':'sub');
   });
   return h+'</svg>';
 }
@@ -400,7 +420,7 @@ function viewEntry(C){
   }else{
     [0,1].forEach(function(i){var t=i?m.b:m.a,val=i?vb:va;
       h+='<div class="ent"><span class="tn">'+esc(name(t))+'</span><div class="step"><button type="button" data-step="'+i+'" data-d="-1" aria-label="'+esc(name(t))+'の点を1点減らす">−</button><input type="number" inputmode="numeric" min="0" max="99" id="score-'+i+'" value="'+esc(val)+'" aria-label="'+esc(name(t))+'の得点"><button type="button" data-step="'+i+'" data-d="1" aria-label="'+esc(name(t))+'の点を1点増やす">＋</button></div></div>';});
-    h+='<p class="note">審判：'+esc(m.ref==null?m.pref:name(m.ref))+'　'+(v?'保存済み：'+v[0]+' - '+v[1]:'未入力')+'</p><p class="note" id="entry-msg" role="status"></p>';
+    h+='<p class="note">審判（主審・副審・線審・得点）：'+esc(m.ref==null?m.pref:name(m.ref))+'　'+(v?'保存済み：'+v[0]+' - '+v[1]:'未入力')+'</p><p class="note" id="entry-msg" role="status"></p>';
   }
   h+='<div class="actions"><button type="button" class="btn" id="prev"'+(cursor===0?' disabled':'')+'>◀ 前の試合</button><button type="button" class="btn" id="next"'+(cursor===n-1?' disabled':'')+'>次の試合 ▶</button></div>';
   if(ready) h+='<div class="actions"><button type="button" class="btn primary" id="save-score">保存して次へ</button>'+(v?'<button type="button" class="btn" id="clear-score">結果を消す</button>':'')+'</div>';
